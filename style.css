@@ -1,0 +1,349 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #020617;
+  font-family: Arial, sans-serif;
+}
+
+#game {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+/* Campo com imagem + perspectiva */
+#field {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+
+  background: url("assets/fundo-tablet.png") no-repeat center center;
+  background-size: 100% 100%;
+  /* ✅ ACHATA/ESTICA conforme a tela */
+  overflow: hidden;
+}
+
+/* TABLET */
+@media (min-width: 1639px) {
+  body {
+    background-image: url("assets/fundo-tablet.png") !important;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+}
+
+
+
+/* Gol */
+#goal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 64%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+#keeper {
+  position: absolute;
+  top: 26%;
+  left: 50%;
+  width: 140px;
+  transform: translateX(-50%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+
+/* Bola */
+#ball {
+  position: absolute;
+  width: 180px !important;
+  height: 180px !important;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #d1d5db 60%);
+  left: 50%;
+  top: 72%;
+  transform: translateX(-50%);
+  cursor: grab;
+  touch-action: none;
+  z-index: 4;
+}
+
+/* =========================
+   ALVOS DO GOL
+========================= */
+.target {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  background: radial-gradient(circle at 30% 30%, #22c55e, #15803d);
+  box-shadow:
+    0 0 10px rgba(34, 197, 94, 0.8),
+    inset 0 0 8px rgba(255, 255, 255, 0.6);
+  z-index: 3;
+  pointer-events: none;
+  animation: pulseTarget 4s infinite ease-in-out;
+}
+
+@keyframes pulseTarget {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+/* POSIÇÕES RELATIVAS AO FUNDO */
+.target.top {
+  top: 40%;
+}
+
+.target.bottom {
+  top: 55%;
+}
+
+.target.left {
+  left: 15%;
+}
+
+.target.right {
+  left: 72%;
+}
+
+.target.center.top-center {
+  top: 48%;
+  left: 45%;
+}
+
+
+.target.hidden {
+  visibility: hidden;
+  opacity: 0;
+  transform: scale(0.4);
+}
+
+#ball3d {
+  position: absolute;
+  width: 360px !important;
+  /* MAIOR que a bola */
+  height: 360px !important;
+  left: 50%;
+  top: 82%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 6;
+}
+
+
+
+/* Texto */
+/* =========================
+   HINT CENTRALIZADO
+========================= */
+#hint {
+  position: absolute;
+  top: 20% !important;
+  left: 50% !important;
+  width: min(92%, 900px) !important;
+  transform: translate(-50%, -50%) !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(22px, 4vw, 48px);
+  letter-spacing: 2px;
+
+  color: #ffffff;
+  
+
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  font-family: "Bungee", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 100px !important;
+}
+
+/* Quando ativo */
+#hint.show {
+  animation: hintInCenter 0.6s ease-out forwards;
+}
+
+/* Quando some */
+#hint.hide {
+  animation: hintOutCenter 0.4s ease-in forwards;
+}
+
+/* Entrada (a partir do centro) */
+@keyframes hintInCenter {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Saída (mantendo no centro) */
+@keyframes hintOutCenter {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+
+/* Quando ativo */
+#hint.show {
+  animation: hintIn 0.6s ease-out forwards;
+}
+
+/* Quando some */
+#hint.hide {
+  animation: hintOut 0.4s ease-in forwards;
+}
+
+/* Entrada */
+@keyframes hintIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Saída */
+@keyframes hintOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 1200px) {
+
+  /* Gol */
+  #goal {
+    width: 88%;
+    top: 57.5%;
+  }
+
+  /* Goleiro */
+  #keeper {
+    width: 180px;
+    top: 63.5%;
+  }
+
+  /* Bola */
+  #ball {
+    width: 120px;
+    height: 120px;
+    top: 89.6%;
+  }
+
+  /* Texto */
+  #hint {
+    font-size: 34px;
+    bottom: 3%;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  /* Gol */
+  #goal {
+    width: 92%;
+    top: 22%;
+  }
+
+  /* Goleiro */
+  #keeper {
+    width: 90px;
+    top: 32%;
+  }
+
+  /* Bola */
+  #ball {
+    width: 32px;
+    height: 32px;
+    top: 78%;
+  }
+
+  /* Texto */
+  #hint {
+    font-size: 13px;
+  }
+
+}
+
+@media (min-width: 1200px) {
+
+  /* Gol */
+  #goal {
+    width: 58%;
+  }
+
+  /* Goleiro */
+  #keeper {
+
+    width: 150px;
+  }
+
+  /* Bola */
+  #ball {
+    width: 48px;
+    height: 48px;
+  }
+
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JOGO FUTEBOL RUTRA - Acerte o Gol</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <div id="game">
+    <div id="field">
+
+      <!-- ALVOS -->
+      <img src="assets/alvo.png" class="target top left" />
+      <img src="assets/alvo.png" class="target top right" />
+      <img src="assets/alvo.png" class="target center top-center" />
+      <img src="assets/alvo.png" class="target bottom left" />
+      <img src="assets/alvo.png" class="target bottom right" />
+
+      <!-- CANVAS DA BOLA 3D -->
+      <img src="assets/bola.png" id="ball" draggable="false" style="opacity:0; pointer-events:auto;" />
+      <canvas id="ball3d"></canvas>
+
+    </div>
+
+    <div id="hint">ARRASTE A BOLA PARA CHUTAR</div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+
+  <script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+
+  <!-- SEU HTML NORMAL -->
+  <script type="module" src="script.js"></script>
+
+
+</body>
+
+</html>
