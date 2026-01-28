@@ -77,7 +77,7 @@ body {
   transform: translateX(-50%);
   cursor: grab;
   touch-action: none;
-  z-index: 10000  !important;
+  z-index: 10000 !important;
 }
 
 /* =========================
@@ -85,8 +85,8 @@ body {
 ========================= */
 .target {
   position: absolute;
-  width: 100px;
-  height: 100px;
+  width: 85px;
+  height: 85px;
   border-radius: 50%;
   border: 3px solid rgba(255, 255, 255, 0.9);
   background: radial-gradient(circle at 30% 30%, #22c55e, #15803d);
@@ -114,7 +114,7 @@ body {
 
 /* POSIÇÕES RELATIVAS AO FUNDO */
 .target.top {
-  top: 40%;
+  top: 43%;
 }
 
 .target.bottom {
@@ -122,18 +122,149 @@ body {
 }
 
 .target.left {
-  left: 15%;
+  left: 9%;
 }
 
 .target.right {
-  left: 72%;
+  left: 83%;
 }
 
 .target.center.top-center {
-  top: 48%;
-  left: 45%;
+  top: 49%;
+  left: 48%;
 }
 
+/* ===== TELA DE INÍCIO ===== */
+#startScreen {
+
+  position: fixed;
+  inset: 0;
+  /* Gradiente que simula luz de estádio */
+  background: radial-gradient(circle, rgba(30, 99, 213, 0.2) 0%, rgba(0, 0, 0, 0.85) 100%);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.startContent {
+  text-align: center;
+  color: #fff;
+  font-family: 'Bungee', cursive;
+  padding: 20px;
+}
+
+/* Título com estilo de Logo */
+.game-title {
+  font-size: clamp(48px, 8vw, 80px);
+  /* Responsivo */
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: 14px;
+  /* Efeito de profundidade e borda */
+  font-family: "Arial" !important;
+}
+
+#playBtn {
+  position: relative;
+  overflow: hidden;
+  font-family: 'Bungee', cursive;
+  font-size: 28px;
+  padding: 20px 60px;
+  border-radius: 12px;
+  /* Borda usando o azul sólido para destaque */
+  border: 3px solid rgba(30, 99, 213, 0.8);
+  cursor: pointer;
+
+  /* Gradiente usando a base da cor solicitada */
+  background: linear-gradient(180deg, rgba(30, 99, 213, 0.4) 0%, rgba(30, 99, 213, 0.9) 100%);
+
+  color: #fff;
+  /* Sombra (glow) azulada */
+  box-shadow: 0 0 20px rgba(30, 99, 213, 0.3), 0 10px 0 #154696;
+  transition: all .1s ease;
+  outline: none;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#playBtn:hover {
+  transform: translateY(-5px);
+  /* Aumenta o brilho no hover */
+  background: linear-gradient(180deg, rgba(30, 99, 213, 0.6) 0%, rgba(30, 99, 213, 1) 100%);
+  box-shadow: 0 0 30px rgba(30, 99, 213, 0.6), 0 15px 0 #154696;
+}
+
+#playBtn:active {
+  transform: translateY(5px);
+  box-shadow: 0 0 10px rgba(30, 99, 213, 0.2), 0 2px 0 #154696;
+}
+
+.game-logo {
+  width: 380px;
+  /* Ajuste o tamanho conforme necessário */
+  height: auto;
+  margin-bottom: 20px;
+  /* Espaço entre a logo e o título */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  filter: invert(1) brightness(1.2) contrast(1.5);
+  /* Filtro para dar um leve brilho/sombra branca se a logo for escura */
+
+  /* Animação de entrada igual ao título */
+  animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* Ajuste fino no título para não ficar colado na logo */
+.game-title {
+  margin-top: 0;
+  font-size: 25px;
+  margin-bottom: 45px;
+}
+
+/* Ajuste no brilho interno para combinar com o azul */
+.btn-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+
+  20% {
+    left: 150%;
+  }
+
+  100% {
+    left: 150%;
+  }
+}
+
+/* ===== ANIMAÇÃO DE ENTRADA DO TÍTULO ===== */
+.startContent h1 {
+  animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 
 .target.hidden {
   visibility: hidden;
@@ -152,6 +283,7 @@ body {
   pointer-events: none;
   z-index: 6 !important;
 }
+
 #goal3d {
   position: absolute;
   inset: 0;
@@ -163,6 +295,7 @@ body {
 #ball3d {
   z-index: 3;
 }
+
 #goal3d {
   background: transparent !important;
 }
@@ -174,7 +307,8 @@ body {
   width: 100% !important;
   height: 100% !important;
   pointer-events: none;
-  z-index: 1; /* atrás da bola e dos alvos */
+  z-index: 1;
+  /* atrás da bola e dos alvos */
 }
 
 #ball,
@@ -207,7 +341,7 @@ body {
   letter-spacing: 2px;
 
   color: #ffffff;
-  
+
 
   opacity: 0;
   pointer-events: none;
@@ -378,6 +512,7 @@ body {
   }
 
 }
+
 #goal3d {
   position: absolute;
   inset: 0;

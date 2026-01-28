@@ -13,6 +13,8 @@ const field = document.getElementById("field");
 const ball = document.getElementById("ball");
 const hint = document.getElementById("hint");
 const targets = document.querySelectorAll(".target");
+let gameReady = false;
+
 function shootConfetti(x, y) {
     const rect = field.getBoundingClientRect();
 
@@ -133,7 +135,7 @@ daeLoader.load(
         const goal = collada.scene;
 
         /* 🔥 Collada geralmente vem MUITO grande */
-        goal.scale.setScalar(0.009); // ajuste base (0.005–0.05)
+        goal.scale.setScalar(0.01); // ajuste base (0.005–0.05)
 
         /* centraliza corretamente */
         const box = new THREE.Box3().setFromObject(goal);
@@ -141,7 +143,7 @@ daeLoader.load(
         goal.position.sub(center);
 
         /* ajuste fino visual */
-        goal.position.y += 0.95;   // sobe a trave
+        goal.position.y += 0.99;   // sobe a trave
         goal.position.z -= 0.9;    // empurra pra dentro do gol
 
         goalScene.add(goal);
@@ -202,6 +204,24 @@ const camera = new THREE.PerspectiveCamera(
     0.1,
     100
 );
+const startScreen = document.getElementById("startScreen");
+const playBtn = document.getElementById("playBtn");
+const game = document.getElementById("game");
+
+playBtn.addEventListener("click", () => {
+    startScreen.style.opacity = "0";
+    startScreen.style.pointerEvents = "none";
+    game.classList.remove("blurred");
+
+    gameReady = true;
+    // showHint("ARRASTE A BOLA PARA CHUTAR");
+
+    requestAnimationFrame(loop);
+
+    setTimeout(() => {
+        startScreen.remove();
+    }, 500);
+});
 
 // câmera mais distante e menos inclinada
 camera.position.set(0, 1.8, 3.8);
@@ -249,13 +269,15 @@ loader.load("assets/ball.glb", (gltf) => {
 function renderBall3D() {
     requestAnimationFrame(renderBall3D);
 
-    if (ball3D) {
-        ball3D.rotation.x += 0.02;
-        ball3D.rotation.y += 0.03;
+    // 🔒 bola parada antes do chute
+    if (ball3D && shot) {
+        ball3D.rotation.x += velocity.y * 0.10;
+        ball3D.rotation.z += velocity.x * 0.10;
     }
 
     renderer.render(scene, camera);
 }
+
 
 renderBall3D();
 
@@ -612,14 +634,15 @@ function updateBall() {
    LOOP
 ========================= */
 function loop() {
+    if (!gameReady) return;
     updateBall();
     requestAnimationFrame(loop);
 }
 
+
 /* START */
 /* START */
 requestAnimationFrame(() => {
-    resetBall(true); // 👈 início do jogo
-    gameStarted = true;
-    loop();
+    resetBall(true);
+    game.classList.add("blurred");
 });
