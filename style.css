@@ -77,7 +77,7 @@ body {
   transform: translateX(-50%);
   cursor: grab;
   touch-action: none;
-  z-index: 4;
+  z-index: 10000  !important;
 }
 
 /* =========================
@@ -150,10 +150,41 @@ body {
   top: 82%;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  z-index: 6;
+  z-index: 6 !important;
+}
+#goal3d {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#ball,
+#ball3d {
+  z-index: 3;
+}
+#goal3d {
+  background: transparent !important;
 }
 
 
+#goal3d {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none;
+  z-index: 1; /* atrás da bola e dos alvos */
+}
+
+#ball,
+#ball3d {
+  z-index: 3;
+}
+
+.target {
+  z-index: 4;
+}
 
 /* Texto */
 /* =========================
@@ -346,4 +377,13 @@ body {
     height: 48px;
   }
 
+}
+#goal3d {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: transparent;
+  z-index: 1;
 }

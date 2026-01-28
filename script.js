@@ -4,6 +4,8 @@
 ========================= */
 import * as THREE from "three";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
+import { ColladaLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/ColladaLoader.js";
+
 /* =========================
    ELEMENTOS
 ========================= */
@@ -70,6 +72,8 @@ let shotPower = 0;
 let start = { x: 0, y: 0 };
 let dragVector = { x: 0, y: 0 };
 let velocity = { x: 0, y: 0 };
+let enteringGoal = false;
+let goalProgress = 0;
 
 /* =========================
    HINT
@@ -87,6 +91,86 @@ function hideHint() {
 }
 
 showHint("");
+/* =========================
+   GOL 3D — TRAVE (.DAE)
+========================= */
+const goalCanvas = document.getElementById("goal3d");
+const goalScene = new THREE.Scene();
+
+const goalCamera = new THREE.PerspectiveCamera(
+    50,
+    field.offsetWidth / field.offsetHeight,
+    0.1,
+    100
+);
+
+// câmera estilo pênalti
+goalCamera.position.set(0, 1.4, 4.2);
+goalCamera.lookAt(0, 1.1, 0);
+
+const goalRenderer = new THREE.WebGLRenderer({
+    canvas: goalCanvas,
+    alpha: true,
+    antialias: true
+});
+
+goalRenderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
+goalRenderer.setSize(field.offsetWidth, field.offsetHeight);
+goalRenderer.setClearColor(0x000000, 0); // fundo transparente
+
+/* luz simples */
+goalScene.add(new THREE.AmbientLight(0xffffff, 0.9));
+const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+sun.position.set(3, 5, 3);
+goalScene.add(sun);
+
+/* carregar TRAVE .DAE */
+const daeLoader = new ColladaLoader();
+
+daeLoader.load(
+    "assets/trave.dae",   // 👈 CONFIRA O NOME
+    (collada) => {
+        const goal = collada.scene;
+
+        /* 🔥 Collada geralmente vem MUITO grande */
+        goal.scale.setScalar(0.009); // ajuste base (0.005–0.05)
+
+        /* centraliza corretamente */
+        const box = new THREE.Box3().setFromObject(goal);
+        const center = box.getCenter(new THREE.Vector3());
+        goal.position.sub(center);
+
+        /* ajuste fino visual */
+        goal.position.y += 0.95;   // sobe a trave
+        goal.position.z -= 0.9;    // empurra pra dentro do gol
+
+        goalScene.add(goal);
+    },
+    undefined,
+    (err) => {
+        console.error("Erro ao carregar trave.dae:", err);
+    }
+);
+/* =========================
+   ENTROU NO GOL (SEM ACERTAR ALVO)
+========================= */
+
+
+/* loop */
+function renderGoal() {
+    requestAnimationFrame(renderGoal);
+    goalRenderer.render(goalScene, goalCamera);
+}
+renderGoal();
+
+/* resize */
+window.addEventListener("resize", () => {
+    const w = field.offsetWidth;
+    const h = field.offsetHeight;
+    goalCamera.aspect = w / h;
+    goalCamera.updateProjectionMatrix();
+    goalRenderer.setSize(w, h);
+});
 
 /* =========================
    HELPERS
@@ -188,7 +272,7 @@ function resetBall(initial = false) {
     const extraOffset = initial ? 55 : 35;
 
     const left = `${r.width / 2}px`;
-    const top  = `${(r.height * GROUND_RATIO) - extraOffset}px`;
+    const top = `${(r.height * GROUND_RATIO) - extraOffset}px`;
     const transform = "translate(-50%, -50%) scale(1)";
 
     ball.style.left = left;
@@ -280,7 +364,7 @@ ball.addEventListener("pointerup", () => {
 
     const dist = Math.hypot(dragVector.x, dragVector.y);
     if (dist < MIN_DRAG_TO_SHOOT) {
-        showHint("PUXE MAIS FORTE", );
+        showHint("PUXE MAIS FORTE",);
         setTimeout(resetBall, 600);
         return;
     }
@@ -323,7 +407,7 @@ function checkTargetHit() {
         const distance = Math.hypot(dx, dy);
 
         const targetRadius = tRect.width * 0.25;
-        const ballRadius   = ballRect.width * 0.45;
+        const ballRadius = ballRect.width * 0.45;
 
         if (distance < targetRadius + ballRadius) {
             hitTarget(target);
@@ -377,6 +461,46 @@ function hitTarget(target) {
 function updateBall() {
     if (!shot) return;
 
+    const fieldH = field.offsetHeight;
+    const fieldW = field.offsetWidth;
+
+    /* =========================
+       ANIMAÇÃO: BOLA ENTRANDO NO GOL
+    ========================= */
+    if (enteringGoal) {
+        goalProgress += 0.05;
+
+        const zScale = 1 - goalProgress * 0.6;
+        const fade = 1 - goalProgress;
+
+        ball.style.transform = `translate(-50%, -50%) scale(${zScale})`;
+        ball.style.opacity = fade;
+
+        canvas3D.style.transform = ball.style.transform;
+        canvas3D.style.opacity = fade;
+
+        if (ball3D) {
+            ball3D.rotation.x += 0.1;
+            ball3D.rotation.z += 0.08;
+            ball3D.scale.setScalar(1.7 * zScale);
+        }
+
+        if (goalProgress >= 1) {
+            enteringGoal = false;
+            shot = false;
+
+            showHint("DEFESA DO GOLEIRO!");
+
+            setTimeout(() => {
+                ball.style.opacity = "1";
+                canvas3D.style.opacity = "1";
+                resetBall();
+            }, 900);
+        }
+
+        return; // ⛔ impede física normal
+    }
+
     /* =========================
        FÍSICA BÁSICA
     ========================= */
@@ -387,17 +511,30 @@ function updateBall() {
     const nextX = ball.offsetLeft + velocity.x;
     const nextY = ball.offsetTop + velocity.y;
 
+    /* =========================
+       PROFUNDIDADE VISUAL REAL
+    ========================= */
+    const goalVisualLine = fieldH * 0.52;
+
+    if (nextY > goalVisualLine) {
+        ball.style.zIndex = "3";
+        canvas3D.style.zIndex = "3";
+    } else {
+        ball.style.zIndex = "6";
+        canvas3D.style.zIndex = "6";
+    }
+
+    /* =========================
+       APLICA POSIÇÃO
+    ========================= */
     ball.style.left = `${nextX}px`;
     ball.style.top = `${nextY}px`;
-
-    const fieldH = field.offsetHeight;
-    const fieldW = field.offsetWidth;
 
     /* =========================
        PROFUNDIDADE (PERSPECTIVA)
     ========================= */
     const progress = 1 - nextY / fieldH;
-    const scale = 0.45 + progress * 0.55;
+    const scale = Math.min(0.85, 0.45 + progress * 0.55);
 
     ball.style.transform = `translate(-50%, -50%) scale(${scale})`;
 
@@ -409,7 +546,6 @@ function updateBall() {
     canvas3D.style.transform = ball.style.transform;
 
     if (ball3D) {
-        // spin realista baseado na velocidade
         ball3D.rotation.x += velocity.y * 0.015;
         ball3D.rotation.z += velocity.x * 0.015;
     }
@@ -417,7 +553,7 @@ function updateBall() {
     /* =========================
        COLISÃO COM ALVOS 🎯
     ========================= */
-    if (velocity.y > 0 && checkTargetHit()) {
+    if (nextY <= fieldH * 0.55 && checkTargetHit()) {
         shot = false;
         return;
     }
@@ -434,7 +570,6 @@ function updateBall() {
             velocity.y = -velocity.y * BOUNCE_DAMPING;
             velocity.x *= 0.88;
         } else {
-            // para a bola
             velocity.x = 0;
             velocity.y = 0;
             shot = false;
@@ -472,6 +607,7 @@ function updateBall() {
 }
 
 
+
 /* =========================
    LOOP
 ========================= */
@@ -487,4 +623,3 @@ requestAnimationFrame(() => {
     gameStarted = true;
     loop();
 });
-
