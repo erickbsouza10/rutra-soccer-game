@@ -51,7 +51,7 @@ function shootConfetti(x, y) {
 const MIN_DRAG_TO_SHOOT = 18;
 const MAX_DRAG = 80;
 
-const POWER = 0.22;
+const POWER = 0.15;
 const GRAVITY = 0.26;
 
 const GROUND_RATIO = 0.88;        // posição inicial da bola
@@ -107,7 +107,7 @@ function rectsCollide(a, b) {
 
 const canvas3D = document.getElementById("ball3d");
 
-const SIZE = 360; // mantém como está (não é o problema)
+const SIZE = 200; // mantém como está (não é o problema)
 
 const scene = new THREE.Scene();
 

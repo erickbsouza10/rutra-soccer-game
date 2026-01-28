@@ -85,8 +85,8 @@ body {
 ========================= */
 .target {
   position: absolute;
-  width: 150px;
-  height: 150px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   border: 3px solid rgba(255, 255, 255, 0.9);
   background: radial-gradient(circle at 30% 30%, #22c55e, #15803d);
@@ -143,9 +143,9 @@ body {
 
 #ball3d {
   position: absolute;
-  width: 360px !important;
+  width: 200px !important;
   /* MAIOR que a bola */
-  height: 360px !important;
+  height: 200px !important;
   left: 50%;
   top: 82%;
   transform: translate(-50%, -50%);
