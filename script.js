@@ -270,16 +270,61 @@ function renderBall3D() {
     requestAnimationFrame(renderBall3D);
 
     // 🔒 bola parada antes do chute
-    if (ball3D && shot) {
-        ball3D.rotation.x += velocity.y * 0.10;
-        ball3D.rotation.z += velocity.x * 0.10;
+    if (ball3D) {
+        if (!shot && dragging) {
+            // 🎯 MIRA — rotação suave enquanto mira
+            ball3D.rotation.y = -aimAngle * 0.6;
+        }
+
+        if (shot) {
+            // 🦶 rotação normal durante o chute
+            ball3D.rotation.x += velocity.y * 0.10;
+            ball3D.rotation.z += velocity.x * 0.10;
+        }
+        if (ball3D && !shot && !dragging) {
+            ball3D.rotation.y = aimYaw;
+        }
+
     }
+
 
     renderer.render(scene, camera);
 }
 
 
 renderBall3D();
+
+if (ball3D) {
+    ball3D.rotation.y = 0;
+}
+let aiming = false;
+let aimYaw = 0;        // ângulo de mira (rad)
+let lastAimX = 0;
+
+const MAX_AIM_ANGLE = Math.PI / 4; // 45°
+field.addEventListener("pointerdown", (e) => {
+    if (shot || dragging) return;
+
+    aiming = true;
+    lastAimX = e.clientX;
+    field.setPointerCapture(e.pointerId);
+});
+field.addEventListener("pointermove", (e) => {
+    if (!aiming || shot) return;
+
+    const dx = e.clientX - lastAimX;
+    lastAimX = e.clientX;
+
+    // sensibilidade da mira
+    aimYaw += dx * 0.005;
+
+    // limita o ângulo
+    aimYaw = THREE.MathUtils.clamp(
+        aimYaw,
+        -MAX_AIM_ANGLE,
+        MAX_AIM_ANGLE
+    );
+});
 
 /* =========================
    RESET
@@ -374,6 +419,8 @@ field.addEventListener("pointermove", (e) => {
 
     const scale = 1 - dist / (MAX_DRAG * 2.5);
     ball.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    // ângulo de mira (visual)
+
 });
 
 /* =========================
